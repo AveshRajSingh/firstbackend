@@ -2,8 +2,10 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
-import jwt from "jsonwebtoken";
-
+import jwt from "jsonwebtoken"
+import dotenv from "dotenv";
+import { connectDb } from "./db/index.js";
+dotenv.config()
 const app = express();
 
 const __filename = fileURLToPath(import.meta.url);
@@ -14,12 +16,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
-app.get("/", (req, res) => {
-  res.send("hello");
+connectDb()
+.then(() =>{
+    console.log("db is connected")
+    app.listen(process.env.PORT, () => {
+        console.log("app is listening on port 3000")
+      }).on('error', (err) => {
+        console.error('Error starting server:', err)
+      })
 })
 
-app.listen(3000, () => {
-  console.log("app is listening on port 3000")
-}).on('error', (err) => {
-  console.error('Error starting server:', err)
-})
