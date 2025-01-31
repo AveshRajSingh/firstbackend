@@ -33,4 +33,41 @@ const registerUser = async (req, res) => {
     }
 }
 
-export { registerUser }
+const loginUser = async (req, res) => {
+    // get the details from the request
+    // find the user from that details 
+    // if user exists then check the password
+    // if password is correct then generate the token
+    // send the token to the user
+    // if password is wrong then send the message
+    // if user does not exist then send the message
+    try {
+        const {email,password} = req.body;
+        console.log("email : and password",email,password)  
+        if(!email || !password) {
+            throw new ApiError(400, "Bad Request");
+        }
+        const user = await User.findOne({email});
+        if(!user) {
+            throw new ApiError(400, "User does not exist");
+        }
+        console.log("user is ",user)
+        const isPasswordCorrect = await user.isPasswordCorrect(password);
+        if(!isPasswordCorrect) {
+            throw new ApiError(400, "Password is incorrect");
+        }
+        const accessToken = user.generateAccessToken();
+        const refreshToken = user.generateRefreshToken();
+        user.refreshToken = refreshToken;
+        await user.save();
+        res.cookie("accessToken", accessToken, {httpOnly: true, secure: true, sameSite: "none"});
+        res.cookie("refreshToken", refreshToken, {httpOnly: true, secure: true, sameSite: "none"});
+        const userTobeSent = await User.findById(user._id).select("-password");
+        res.send(new ApiResponse(200,"Login successful",userTobeSent));
+    }catch(error) {
+        console.log(error);
+        throw new ApiError(500, "Internal Server Error");
+    }
+}
+
+export { registerUser, loginUser }
