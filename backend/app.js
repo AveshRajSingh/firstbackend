@@ -2,7 +2,6 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
-import jwt from "jsonwebtoken"
 import dotenv from "dotenv";
 import { connectDb } from "./db/index.js";
 dotenv.config()
