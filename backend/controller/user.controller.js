@@ -48,7 +48,6 @@ const loginUser = async (req, res) => {
     if (!user) {
       throw new ApiError(400, "User does not exist");
     }
-    console.log("user is ", user);
     const isPasswordCorrect = await user.isPasswordCorrect(password);
     if (!isPasswordCorrect) {
       throw new ApiError(400, "Password is incorrect");
@@ -60,6 +59,11 @@ const loginUser = async (req, res) => {
     const userTobeSent = await User.findById(user._id).select("-password");
 
     res.cookie("token", accessToken, {
+      httpOnly: true,
+      sameSite:"none",
+      secure:true
+    });
+    res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       sameSite:"none",
       secure:true

@@ -26,5 +26,5 @@ connectDb()
 })
 
 import userRouter from "./routes/user.route.js"
-
+ 
 app.use("/api/v1/user",userRouter)
