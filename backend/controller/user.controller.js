@@ -83,6 +83,16 @@ const changePassword = async (req, res) => {
   if (password === newPassword) {
     throw new ApiError(400, "New password cannot be same as old password");
   }
+
+  const user = await User.findById(req.user._id);
+  const isPasswordCorrect = await user.isPasswordCorrect(password);
+  if (!isPasswordCorrect) {
+    throw new ApiError(400, "Password is incorrect");
+  }
+  user.password = newPassword;
+  await user.save();
+  res.send(new ApiResponse(200, "Password changed successfully"));
+  
 };
 
 export { registerUser, loginUser,changePassword };

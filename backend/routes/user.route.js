@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { loginUser, registerUser } from "../controller/user.controller.js";
+import { loginUser, registerUser, changePassword } from "../controller/user.controller.js";
 import { upload } from "../middleware/multer.middleware.js";
 import { verifyUser } from "../middleware/veryfyUser.js";
 
@@ -11,6 +11,8 @@ const router = Router();
 router.route("/register").post(upload.single("picture"), registerUser);
 router.route("/login").post(loginUser)
 
-router.get("/some",verifyUser,(req,res)=>{console.log("userVeryfied")})
+// protected route
+
+router.route("/changePassword").post(verifyUser, changePassword)
 
 export default router;
