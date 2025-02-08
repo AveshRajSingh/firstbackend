@@ -4,17 +4,20 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 
 const registerUser = async (req, res) => {
   try {
-    console.log("inside the registerUser");
     const { name, username, email, password, contact } = req.body;
+
+    // Validate required fields
     if (!name || !username || !email || !password) {
-      throw new ApiError(400, "Bad Request");
-    }
-    // check if user already exists
-    const user = await User.findOne({ email });
-    if (user) {
-      throw new ApiError(400, "User already exists");
+      return res.status(400).json(new ApiResponse(400, "Bad Request"));
     }
 
+    // Check if user already exists
+    const user = await User.findOne({ email });
+    if (user) {
+      return res.status(400).json(new ApiResponse(400, "User already exists"));
+    }
+
+    // Create new user
     const createdUser = await User.create({
       name,
       username,
@@ -23,10 +26,12 @@ const registerUser = async (req, res) => {
       contact: contact ?? "",
       picture: req.file ? req.file.path : null,
     });
-    res.send(new ApiResponse(200, "user created successfully", createdUser));
+
+    // Send success response
+    return res.json(new ApiResponse(200, "User created successfully", createdUser));
   } catch (error) {
-    console.log(error);
-    throw new ApiError(500, "Internal Server Error");
+    console.error("Error during registration:", error);
+    return res.status(500).json(new ApiResponse(500, "Internal Server Error"));
   }
 };
 
@@ -60,15 +65,15 @@ const loginUser = async (req, res) => {
 
     res.cookie("token", accessToken, {
       httpOnly: true,
-      sameSite:"none",
-      secure:true
+      sameSite: "none",
+      secure: true,
     });
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      sameSite:"none",
-      secure:true
+      sameSite: "none",
+      secure: true,
     });
-   res.send(new ApiResponse(200, "Login successful", userTobeSent));
+    res.send(new ApiResponse(200, "Login successful", userTobeSent));
   } catch (error) {
     console.log(error);
     throw new ApiError(500, "Internal Server Error");
@@ -92,7 +97,16 @@ const changePassword = async (req, res) => {
   user.password = newPassword;
   await user.save();
   res.send(new ApiResponse(200, "Password changed successfully"));
-  
 };
 
-export { registerUser, loginUser,changePassword };
+const createAdmin = async (req, res) => {
+  const owner = req.user;
+  if (owner.isAdmin) {
+    throw new ApiError(401, "you are already an owner");
+  }
+  owner.isAdmin = true;
+  await owner.save();
+  res.send(new ApiResponse(200, "Owner created successfully"));
+};
+
+export { registerUser, loginUser, changePassword, createAdmin };

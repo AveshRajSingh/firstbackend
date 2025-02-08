@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { loginUser, registerUser, changePassword } from "../controller/user.controller.js";
+import { loginUser, registerUser, changePassword,createAdmin } from "../controller/user.controller.js";
 import { upload } from "../middleware/multer.middleware.js";
 import { verifyUser } from "../middleware/veryfyUser.js";
 
@@ -14,5 +14,6 @@ router.route("/login").post(loginUser)
 // protected route
 
 router.route("/changePassword").post(verifyUser, changePassword)
+router.route("/createOwner").post(verifyUser, createAdmin)
 
 export default router;

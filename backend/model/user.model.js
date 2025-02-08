@@ -29,7 +29,10 @@ const userSchema = mongoose.Schema(
         ref: "Cart",
       },
     ],
-    isAdmin: Boolean,
+    isAdmin: {
+      type: Boolean,
+      default: false,
+    },
     contact: {
       type: Number,
     },
