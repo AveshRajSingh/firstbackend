@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 
 const Register = () => {
@@ -31,8 +30,8 @@ const Register = () => {
 
       const data = await response.json();
       console.log(data);
-      if(data.statusCode === 200){
-        alert("User created successfully")
+      if (data.statusCode === 200) {
+        alert("User created successfully");
         setName("");
         setEmail("");
         setPassword("");
@@ -44,9 +43,7 @@ const Register = () => {
     }
   };
 
-  const handleLoginClick = async (e) => {
-    
-  }
+  const handleLoginClick = async (e) => {};
   return (
     <div className="min-h-screen  bg-gray-800  text-white">
       <div className=" flex flex-col items-center py-12 px-4 sm:px-6 lg:px-8">
