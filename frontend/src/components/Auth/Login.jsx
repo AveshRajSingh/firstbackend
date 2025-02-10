@@ -1,9 +1,10 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const navigate = useNavigate(null)
   const handleLoginClick = async (e) => {
     e.preventDefault();
     if (!email || !password) {
@@ -32,7 +33,6 @@ const Login = () => {
       console.error("Error during login:", error);
     }
   };
-
   return (
     <div className="min-h-screen bg-zinc-800 text-white flex justify-center items-center">
       <div className="flex flex-col items-center gap-5 w-[50vw]  py-12 px-4 sm:px-6 lg:px-8">
@@ -61,7 +61,9 @@ const Login = () => {
             >
               Login
             </button>
-            <button className="bg-red-600 w-xl h-10 px-3 py-1 outline-none rounded-lg hover:bg-red-800 transition duration-300">
+            <button
+            onClick={(e) => navigate("/register")}
+             className="bg-red-600 w-xl h-10 px-3 py-1 outline-none rounded-lg hover:bg-red-800 transition duration-300">
               Register
             </button>
           </div>

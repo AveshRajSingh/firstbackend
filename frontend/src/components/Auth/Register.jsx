@@ -1,11 +1,13 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-const Register = () => {
+const Register = ({ registerRef }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [contact, setContact] = useState("");
   const [username, setUsername] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -43,9 +45,8 @@ const Register = () => {
     }
   };
 
-  const handleLoginClick = async (e) => {};
   return (
-    <div className="min-h-screen  bg-gray-800  text-white">
+    <div className="min-h-screen  bg-gray-800  text-white" ref={registerRef}>
       <div className=" flex flex-col items-center py-12 px-4 sm:px-6 lg:px-8">
         <p className="text-xl font-bold text-indigo-600  mb-6 border-b-2 border-blue-500">
           <span className="text-red-600 text-3xl">Create</span> your Account
@@ -96,7 +97,7 @@ const Register = () => {
             </button>
             <button
               className="bg-red-600 w-xl h-10 px-3 py-1 outline-none rounded-lg  hover:bg-red-800  transition duration-300 "
-              onClick={(e) => handleLoginClick(e)}
+              onClick={(e) => navigate("/login")}
             >
               login
             </button>
