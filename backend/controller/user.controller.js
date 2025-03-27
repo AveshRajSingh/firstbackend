@@ -45,7 +45,6 @@ const loginUser = async (req, res) => {
   // if user does not exist then send the message
   try {
     const { email, password } = req.body;
-    console.log("email : and password", email, password);
     if (!email || !password) {
       throw new ApiError(400, "Bad Request");
     }

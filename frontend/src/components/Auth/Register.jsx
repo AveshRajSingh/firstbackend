@@ -11,7 +11,10 @@ const Register = ({ registerRef }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("clicked", e);
+    if(!name || !email || !password || !contact || !username){
+      alert("Please fill all the fields");
+      return;
+    }
     try {
       const response = await fetch(
         "http://localhost:3000/api/v1/user/register",
@@ -29,9 +32,7 @@ const Register = ({ registerRef }) => {
           }),
         }
       );
-
       const data = await response.json();
-      console.log(data);
       if (data.statusCode === 200) {
         alert("User created successfully");
         setName("");
@@ -41,7 +42,9 @@ const Register = ({ registerRef }) => {
         setUsername("");
       }
     } catch (error) {
-      console.error("Error during registration:", error);
+      if(error == "TypeError: Failed to fetch" ){
+        alert("Server is down");
+      }
     }
   };
 

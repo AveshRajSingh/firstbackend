@@ -1,7 +1,6 @@
 
-import Register from './components/Auth/Register'
 import './App.css'
-import Login from './components/Auth/Login'
+import CreateAdmin from './components/Admin/CreateAdmin'
 import HomePage from './components/Home/HomePage'
 
 function App() {
@@ -10,6 +9,7 @@ function App() {
     <>
     {/* <Register /> */}
     <HomePage />
+    <CreateAdmin />
     </>
   )
 }
