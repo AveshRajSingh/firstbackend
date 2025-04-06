@@ -34,3 +34,8 @@ app.use("/api/v1/user",userRouter)
 import adminRouter from "./routes/admin.route.js"
 
 app.use("/api/v1/admin",adminRouter)
+
+
+import productRouter from "./routes/product.route.js"
+
+app.use("/api/v1/products",productRouter)

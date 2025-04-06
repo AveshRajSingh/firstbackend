@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 
 const productSchema = mongoose.Schema({
+    owner:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"User",
+    },
     name: {
         type: String,
         required: true,
@@ -19,13 +23,12 @@ const productSchema = mongoose.Schema({
     },
     imageUrl: {
         type: String,
-        required: true,
     },
     backgroundColor: {
         type: String,
         required: true,
     },
-    foregraundColor: {
+    foregroundColor: {
         type: String,
         required: true,
     },

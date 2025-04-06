@@ -1,7 +1,8 @@
 import { Router } from "express";
-import { loginUser, registerUser, changePassword,createAdmin } from "../controller/user.controller.js";
+import { loginUser, registerUser, changePassword} from "../controller/user.controller.js";
 import { upload } from "../middleware/multer.middleware.js";
 import { verifyUser } from "../middleware/veryfyUser.js";
+import { createAdmin } from "../controller/admin.controller.js";
 
 // upload.single("picture"),
 

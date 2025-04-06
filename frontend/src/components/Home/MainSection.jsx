@@ -4,6 +4,11 @@ import { useNavigate } from "react-router-dom";
 
 const MainSection = ({ registerInView }) => {
   const navigate = useNavigate();
+
+  const handleStartNow = (e) => {
+    e.preventDefault();
+    navigate("/products");
+  };
  
   return (
     <div
@@ -51,7 +56,9 @@ const MainSection = ({ registerInView }) => {
             className="outline-none   px-5 py-3 text-black bg-white rounded-xl w-[30vw]"
             placeholder="Enter your email"
           />
-          <button className="px-4 py-2 bg-orange-700 text-black  transition-all duration-400 animate-pulse  cursor-pointer rounded-lg hover:bg-orange-800 ">
+          <button 
+          onClick={(e) => handleStartNow(e)}
+           className="px-4 py-2 bg-orange-700 text-black  transition-all duration-400 animate-pulse  cursor-pointer rounded-lg hover:bg-orange-800 ">
             Start Now{" "}
           </button>
         </div>

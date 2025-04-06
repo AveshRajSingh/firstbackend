@@ -7,9 +7,9 @@ class ApiError extends Error{
     ){
         super(message);
         this.statusCode = statusCode;
+        this.message = message;
         this.data = null;
         this.errors = errors;
-        this.message = message;
         this.success = false;
 
         if (stack) {
@@ -18,6 +18,16 @@ class ApiError extends Error{
            Error.captureStackTrace(this,this.constructor)
         }
 
+        
+    }
+    toJSON(){
+        return {
+            statusCode: this.statusCode,
+            message: this.message,  // Include message field explicitly
+            data: this.data,
+            errors: this.errors,
+            success: this.success
+        };
     }
 }
 

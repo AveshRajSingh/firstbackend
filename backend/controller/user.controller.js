@@ -1,16 +1,25 @@
 import { User } from "../model/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import emailValidator from "email-validator";
+import { validateEmail } from "../utils/validateEmail.js";
 
 const registerUser = async (req, res) => {
   try {
     const { name, username, email, password, contact } = req.body;
-
     // Validate required fields
     if (!name || !username || !email || !password) {
       return res.status(400).json(new ApiResponse(400, "Bad Request"));
     }
-
+    
+   // Validate if email format is correct
+   if (!emailValidator.validate(email)) {
+    return res.status(400).json(new ApiError(400, "Invalid email format"));
+   }
+  //  const emailValidation = await validateEmail(email);
+  //  if(emailValidation.status === "invalid"){
+  //   return res.status(400).json(new ApiError(400, "email does not exist"));
+  //  }
     // Check if user already exists
     const user = await User.findOne({ email });
     if (user) {
@@ -98,14 +107,5 @@ const changePassword = async (req, res) => {
   res.send(new ApiResponse(200, "Password changed successfully"));
 };
 
-const createAdmin = async (req, res) => {
-  const owner = req.user;
-  if (owner.isAdmin) {
-    throw new ApiError(401, "you are already an owner");
-  }
-  owner.isAdmin = true;
-  await owner.save();
-  res.send(new ApiResponse(200, "Owner created successfully"));
-};
 
-export { registerUser, loginUser, changePassword, createAdmin };
+export { registerUser, loginUser, changePassword};
