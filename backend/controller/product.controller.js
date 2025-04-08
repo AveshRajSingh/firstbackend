@@ -1,10 +1,11 @@
 import Product from "../model/product.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import cloudinary from "cloudinary";
+import { uploadOnCloudinary } from "../utils/Cloudinary.js";
 
 const createProduct = async (req, res) => {
   try {
-    console.log("user is ->",req.user);
     const {
       name,
       price,
@@ -26,21 +27,33 @@ const createProduct = async (req, res) => {
     ) {
       return res.status(400).json(new ApiError(400, "All fields are required"));
     }
-    console.log(name, price, description, countInStock, backgroundColor, foregroundColor, category);
     
     if (req.file && !req.file.originalname) {
       return res.status(400).json(new ApiError(400, "Invalid file"));
     }
-   console.log("before the try")
+    // Upload image to Cloudinary if a file is provided
+    console.log("req.file->",req.file)
+    let imageUrl = null;
+    if (req.file) {
+      try {
+        const result = await uploadOnCloudinary(req.file.path);
+        imageUrl = result.secure_url; // Use the secure URL for HTTPS
+        console.log(imageUrl)
+      }
+      catch (error) {
+        console.error("Error uploading to Cloudinary", error);
+        return res.status(500).json(new ApiError(500, "Error uploading image"));
+      }
+    }
+
     try {
-        console.log("till here")
       const createdProduct = await Product.create({
         owner: req.user._id,
         name,
         price,
         description,
         countInStock,
-        imageUrl: req.file ? req.file.path : null,
+        imageUrl:imageUrl,
         backgroundColor,
         foregroundColor : req.body.foregroundColor,
         category,

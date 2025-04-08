@@ -10,7 +10,7 @@ const verifyUser = async (req, res, next) => {
     }
 
     try {
-      console.log("Inside the try block of verifyUser middleware");
+      
       const decodedToken = await jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
       const user = await User.findById(decodedToken.id).select("-password -refreshToken");
 
@@ -19,7 +19,6 @@ const verifyUser = async (req, res, next) => {
       }
 
       req.user = user;
-      console.log("req.user", req.user);
       return next();
     } catch (error) {
       if (error.name === "TokenExpiredError") {

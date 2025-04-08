@@ -3,6 +3,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import emailValidator from "email-validator";
 import { validateEmail } from "../utils/validateEmail.js";
+import  {uploadOnCloudinary} from "../utils/Cloudinary.js";
 
 const registerUser = async (req, res) => {
   try {
@@ -25,6 +26,14 @@ const registerUser = async (req, res) => {
     if (user) {
       return res.status(400).json(new ApiResponse(400, "User already exists"));
     }
+    if(req.file && !req.file.originalname) {
+      return res.status(400).json(new ApiResponse(400, "Invalid file"));
+    }
+    let imageUrl = null;
+     imageUrl = await uploadOnCloudinary(req.file.path);
+    if (!imageUrl) {
+      return res.status(500).json(new ApiResponse(500, "Error uploading image"));
+    }
 
     // Create new user
     const createdUser = await User.create({
@@ -33,7 +42,7 @@ const registerUser = async (req, res) => {
       email,
       password,
       contact: contact ?? "",
-      picture: req.file ? req.file.path : null,
+      picture: imageUrl.secure_url, // Use the secure URL for HTTPS
     });
 
     // Send success response
