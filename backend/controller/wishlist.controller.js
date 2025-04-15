@@ -1,6 +1,6 @@
 import Wishlist from "../model/wishlist.model.js";
 
-export const addToWishlist = async (req, res) => {
+const addToWishlist = async (req, res) => {
   const { productId } = req.body;
   const userId = req.user._id;
 

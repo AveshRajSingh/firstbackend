@@ -35,7 +35,14 @@ import adminRouter from "./routes/admin.route.js"
 
 app.use("/api/v1/admin",adminRouter)
 
-
 import productRouter from "./routes/product.route.js"
 
 app.use("/api/v1/products",productRouter)
+
+import cartRouter from "./routes/cart.route.js"
+
+app.use("/api/v1/cart", cartRouter)
+
+import wishlistRouter from "./routes/wishlist.route.js"
+
+app.use("/api/v1/wishlist", wishlistRouter)
