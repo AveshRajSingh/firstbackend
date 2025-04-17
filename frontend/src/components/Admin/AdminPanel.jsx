@@ -1,6 +1,6 @@
 import React from 'react'
-import AllProduct from './AllProduct'
-import CreateNewProducts from './CreateNewProducts'
+import AllProduct from './AllAdminProduct.jsx'
+import CreateNewProducts from './CreateNewProducts.jsx'
 
 const AdminPanel = () => {
     const [show,setShow] = React.useState(false);

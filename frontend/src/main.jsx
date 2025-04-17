@@ -5,7 +5,8 @@ import "./index.css";
 import App from "./App.jsx";
 import Login from "./components/Auth/Login.jsx";
 import Register from "./components/Auth/Register.jsx";
-import AllProduct from "./components/Home/AllProducts/AllProduct.jsx";
+import AdminPanel from "./components/Admin/AdminPanel.jsx";
+import HomeAfterLogin from "./components/mainHome/HomeAfterLogin.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -14,7 +15,8 @@ createRoot(document.getElementById("root")).render(
         <Route path="/" element={<App />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element = {<Register />} />
-        <Route path="/products" element={<AllProduct />} />
+        <Route path="/products" element={<HomeAfterLogin />} />
+        <Route path="/admin" element={<AdminPanel />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>
