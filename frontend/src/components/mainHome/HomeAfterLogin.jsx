@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect} from "react";
 import Navbar from "./Navbar.jsx";
 import AllProduct from "./AllProducts/AllProduct.jsx";
 import axios from "axios";
@@ -6,13 +6,11 @@ import { ToastContainer, toast } from "react-toastify";
 
 const HomeAfterLogin = () => {
   const [userData, setUserData] = useState(null);
-  const hasFetchedUser = useRef(false);
 
   // Fetch user data on mount
 
   useEffect(() => {
-    if (hasFetchedUser.current &&userData) {
-        hasFetchedUser.current = true;
+  
     axios
       .get("http://localhost:3000/api/v1/user/currentUser", {
         headers: {
@@ -38,8 +36,8 @@ const HomeAfterLogin = () => {
       .finally(() => {
         console.log("Fetch user data completed");
       });
-    }
-  }, [userData]);
+    
+  }, []);
 
   
 
