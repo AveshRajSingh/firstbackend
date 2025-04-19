@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { loginUser, registerUser, changePassword} from "../controller/user.controller.js";
+import { loginUser, registerUser, changePassword , getCurrentUser} from "../controller/user.controller.js";
 import { upload } from "../middleware/multer.middleware.js";
 import { verifyUser } from "../middleware/veryfyUser.js";
 import { createAdmin } from "../controller/admin.controller.js";
@@ -16,5 +16,6 @@ router.route("/login").post(loginUser)
 
 router.route("/changePassword").post(verifyUser, changePassword)
 router.route("/createOwner").post(verifyUser, createAdmin)
+router.route("/currentUser").get(verifyUser, getCurrentUser)
 
 export default router;

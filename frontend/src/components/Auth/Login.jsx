@@ -37,22 +37,10 @@ const Login = () => {
         }
       );
 
-      console.log("Login response:", response.data);
+      console.log("Login response:", response.data.data);
 
-      if (response.data) {
-        // Extract user data from the response
-        const userData = {
-          _id: response.data._id,
-          name: response.data.name,
-          username: response.data.username,
-          email: response.data.email,
-          isAdmin: response.data.isAdmin,
-          contact: response.data.contact,
-          picture: response.data.picture,
-          refreshToken: response.data.refreshToken
-        };
-
-        setUser(userData);
+      if (response?.data?.data) {
+        setUser(response.data.data);
         toast.success("Login successful");
         setEmail("");
         setPassword("");
@@ -100,14 +88,14 @@ const Login = () => {
 
   return (
     <div className="min-h-screen bg-[conic-gradient(at_bottom_left,_var(--tw-gradient-stops))] from-gray-900 via-purple-900 to-violet-900 text-white relative overflow-hidden">
-      <ToastContainer
-        position="top-right"
+        <ToastContainer
+          position="top-right"
         autoClose={3000}
-        hideProgressBar={false}
+          hideProgressBar={false}
         newestOnTop={true}
-        closeOnClick
-        rtl={false}
-        draggable
+          closeOnClick
+          rtl={false}
+          draggable
         theme="dark"
         style={{ zIndex: 9999 }}
       />
@@ -169,7 +157,7 @@ const Login = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             >
-              {error}
+              {error.message}
             </motion.p>
           )}
 

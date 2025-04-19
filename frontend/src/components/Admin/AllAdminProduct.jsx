@@ -1,46 +1,52 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useContext } from 'react';
 import { FaEdit, FaTrash, FaSearch } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import axios from 'axios';
+import { UserContext } from '../../context/UserContext';
 
 const AllAdminProduct = () => {
+  const {user} = useContext(UserContext);
+  console.log("The user is", user);
+  const ownerId = user._id;
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [error, setError] = useState(null);
 
-  // useEffect(() => {
-  //   fetchProducts();
-  // }, []);
+  useEffect(() => {
+    fetchProducts(ownerId);
+  }, []);
 
-  // const fetchProducts = async () => {
-  //   try {
-  //     const response = await axios.get('/api/products');
-  //     setProducts(response.data);
-  //     setLoading(false);
-  //   } catch (error) {
-  //     setError('Failed to fetch products');
-  //     toast.error('Failed to fetch products. Please try again later.');
-  //     setLoading(false);
-  //   }
-  // };
+  const fetchProducts = async (ownerId) => {
+    try {
+      console.log("owenerId from frontend", ownerId);
+      const response = await axios.get(`http://localhost:3000/api/v1/product/productByOwner/${ownerId}`);
+      console.log("The response is", response.data);
+      setProducts(response.data.data);
+      setLoading(false);
+    } catch (error) {
+      setError('Failed to fetch products');
+      toast.error('Failed to fetch products. Please try again later.');
+      setLoading(false);
+    }
+  };
 
-  // const handleDelete = async (productId) => {
-  //   if (window.confirm('Are you sure you want to delete this product?')) {
-  //     try {
-  //       await axios.delete(`/api/products/${productId}`);
-  //       setProducts(products.filter(product => product._id !== productId));
-  //       toast.success('Product deleted successfully');
-  //     } catch (error) {
-  //       toast.error('Failed to delete product. Please try again later.');
-  //     }
-  //   }
-  // };
+  const handleDelete = async (productId) => {
+    if (window.confirm('Are you sure you want to delete this product?')) {
+      try {
+        await axios.delete(`/api/products/${productId}`);
+        setProducts(products.filter(product => product._id !== productId));
+        toast.success('Product deleted successfully');
+      } catch (error) {
+        toast.error('Failed to delete product. Please try again later.');
+      }
+    }
+  };
 
-  // const filteredProducts = products.filter(product =>
-  //   product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //   product.description.toLowerCase().includes(searchTerm.toLowerCase())
-  // );
+  const filteredProducts = products.filter(product =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    product.description.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   if (loading) {
     return (

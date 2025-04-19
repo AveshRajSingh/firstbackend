@@ -6,6 +6,9 @@ import { uploadOnCloudinary } from "../utils/Cloudinary.js";
 
 const createProduct = async (req, res) => {
   try {
+    if(!req.admin){
+      return res.status(401).json(new ApiError(401, "Unauthorized"));
+    }
     const {
       name,
       price,
@@ -82,4 +85,24 @@ const getProducts = async (req, res) => {
   }
 };
 
-export { createProduct, getProducts };
+const getProductByOwner = async (req, res) => {
+  const { owner } = req.params;
+  console.log("owner from backend", owner);
+
+  if (!owner) {
+    return res.status(400).json(new ApiError(400, "Owner ID is required"));
+  }
+
+  try {
+    const products = await Product.find({ owner });
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, "Products fetched successfully", products));
+  } catch (error) {
+    console.error("Error in getProductByOwner", error);
+    return res.status(500).json(new ApiError(500, "Internal server error"));
+  }
+};
+
+export { createProduct, getProducts, getProductByOwner };

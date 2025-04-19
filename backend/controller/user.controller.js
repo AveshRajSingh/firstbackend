@@ -2,8 +2,7 @@ import { User } from "../model/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import emailValidator from "email-validator";
-import { validateEmail } from "../utils/validateEmail.js";
-import  {uploadOnCloudinary} from "../utils/Cloudinary.js";
+import { uploadOnCloudinary } from "../utils/Cloudinary.js";
 
 const registerUser = async (req, res) => {
   try {
@@ -12,27 +11,27 @@ const registerUser = async (req, res) => {
     if (!name || !username || !email || !password) {
       return res.status(400).json(new ApiResponse(400, "Bad Request"));
     }
-    
-   // Validate if email format is correct
-   if (!emailValidator.validate(email)) {
-    return res.status(400).json(new ApiError(400, "Invalid email format"));
-   }
-  //  const emailValidation = await validateEmail(email);
-  //  if(emailValidation.status === "invalid"){
-  //   return res.status(400).json(new ApiError(400, "email does not exist"));
-  //  }
+
+    // Validate if email format is correct
+    if (!emailValidator.validate(email)) {
+      return res.status(400).json(new ApiError(400, "Invalid email format"));
+    }
     // Check if user already exists
     const user = await User.findOne({ email });
     if (user) {
       return res.status(400).json(new ApiResponse(400, "User already exists"));
     }
-    if(req.file && !req.file.originalname) {
+    if (req.file && !req.file.originalname) {
       return res.status(400).json(new ApiResponse(400, "Invalid file"));
     }
     let imageUrl = null;
-     imageUrl = await uploadOnCloudinary(req.file.path);
-    if (!imageUrl) {
-      return res.status(500).json(new ApiResponse(500, "Error uploading image"));
+    if (req.file) {
+      imageUrl = await uploadOnCloudinary(req.file.path);
+      if (!imageUrl) {
+        return res
+          .status(500)
+          .json(new ApiResponse(500, "Error uploading image"));
+      }
     }
 
     // Create new user
@@ -42,11 +41,13 @@ const registerUser = async (req, res) => {
       email,
       password,
       contact: contact ?? "",
-      picture: imageUrl.secure_url, // Use the secure URL for HTTPS
+      picture: imageUrl?.secure_url || null, // Use the secure URL for HTTPS
     });
 
     // Send success response
-    return res.json(new ApiResponse(200, "User created successfully", createdUser));
+    return res.json(
+      new ApiResponse(200, "User created successfully", createdUser)
+    );
   } catch (error) {
     console.error("Error during registration:", error);
     return res.status(500).json(new ApiResponse(500, "Internal Server Error"));
@@ -54,7 +55,7 @@ const registerUser = async (req, res) => {
 };
 
 const loginUser = async (req, res) => {
-  // get the details from the request
+  // get the details from the request body
   // find the user from that details
   // if user exists then check the password
   // if password is correct then generate the token
@@ -68,11 +69,13 @@ const loginUser = async (req, res) => {
     }
     const user = await User.findOne({ email });
     if (!user) {
-      throw new ApiError(400, "User does not exist");
+      return res.status(400).json(new ApiError(400, "User does not exist")); // new ApiError(400, "User does not exist");
     }
     const isPasswordCorrect = await user.isPasswordCorrect(password);
     if (!isPasswordCorrect) {
-      throw new ApiError(400, "Password is incorrect");
+      return res
+        .status(400)
+        .json(new ApiResponse(400, "Password is incorrect")); // new ApiError(400, "Password is incorrect");
     }
     const accessToken = user.generateAccessToken();
     const refreshToken = user.generateRefreshToken();
@@ -90,31 +93,45 @@ const loginUser = async (req, res) => {
       sameSite: "none",
       secure: true,
     });
-    res.send(new ApiResponse(200, "Login successful", userTobeSent));
+    res.status(200).json(new ApiResponse(200, "Login successful", userTobeSent));
+
   } catch (error) {
     console.log(error);
-    throw new ApiError(500, "Internal Server Error");
+    return res.status(500).json(new ApiResponse(500, "Internal Server Error")); // new ApiError(500, "Internal Server Error");
+  }
+};
+
+const getCurrentUser = async (req, res) => {
+  try {
+    console.log("rotue hit")
+    res
+      .status(200)
+      .json(new ApiResponse(200, "User fetched successfully", req.user));
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(new ApiError(500, "Err while fetching user")); // new ApiError(500, "Internal Server Error");
   }
 };
 
 const changePassword = async (req, res) => {
   const { password, newPassword } = req.body;
   if (!password || !newPassword) {
-    throw new ApiError(400, "Bad Request");
+    return res.status(400).json(new ApiError(400, "Bad Request")); // new ApiError(400, "Bad Request");
   }
   if (password === newPassword) {
-    throw new ApiError(400, "New password cannot be same as old password");
+    return res
+      .status(400)
+      .json(new ApiError(400, "New password cannot be same as old password"));
   }
 
   const user = await User.findById(req.user._id);
   const isPasswordCorrect = await user.isPasswordCorrect(password);
   if (!isPasswordCorrect) {
-    throw new ApiError(400, "Password is incorrect");
+    return res.status(400).json(new ApiError(400, "Password is incorrect"));
   }
   user.password = newPassword;
   await user.save();
   res.send(new ApiResponse(200, "Password changed successfully"));
 };
 
-
-export { registerUser, loginUser, changePassword};
+export { registerUser, loginUser, changePassword, getCurrentUser };

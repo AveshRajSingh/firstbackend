@@ -9,8 +9,6 @@ cloudinary.v2.config({
 
 const uploadOnCloudinary = async (filePath) => {
     try {
-        console.log("cloudinary",cloudinary.v2.uploader);
-        console.log("File path", filePath);
         const result = await cloudinary.v2.uploader.upload(filePath, {
             api_key: process.env.CLOUDINARY_API_KEY,
             api_secret: process.env.CLOUDINARY_API_SECRET,

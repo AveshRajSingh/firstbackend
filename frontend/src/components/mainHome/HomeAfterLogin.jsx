@@ -1,50 +1,14 @@
-import React, { useState, useEffect} from "react";
+import React from "react";
 import Navbar from "./Navbar.jsx";
+
 import AllProduct from "./AllProducts/AllProduct.jsx";
-import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 
 const HomeAfterLogin = () => {
-  const [userData, setUserData] = useState(null);
-
-  // Fetch user data on mount
-
-  useEffect(() => {
-  
-    axios
-      .get("http://localhost:3000/api/v1/user/currentUser", {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        withCredentials: true,
-      })
-      .then((response) => {
-        if (response.status === 200) {
-          toast.success("User data fetched successfully");
-          setUserData(response.data); // async update
-        } else {
-          toast.error("Failed to fetch user data");
-        }
-      })
-      .catch((error) => {
-        console.error(
-          error.response?.data?.message ||
-            error.message ||
-            "Failed to fetch user data. Please try again later."
-        );
-      })
-      .finally(() => {
-        console.log("Fetch user data completed");
-      });
-    
-  }, []);
-
-  
-
   return (
     <div>
       <div className="sticky top-0 z-10">
-        <Navbar userData={userData} />
+        <Navbar />
         <ToastContainer
           position="bottom-right"
           autoClose={2000}

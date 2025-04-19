@@ -1,17 +1,18 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import { ShoppingBag, User, ShoppingCart, Heart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { UserContext } from '../../context/UserContext';
 
-const Navbar = ({ userData }) => {
+const Navbar = () => {
   const navigate = useNavigate();
+  const {user} = useContext(UserContext);
 
   const handleUserClick = () => {
-    console.log("User data:", userData);
     
-    if (userData.data.isAdmin) {
+    if (user.isAdmin) {
       navigate('/admin');
     } else {
-      navigate('/user');
+      navigate('/profile');
     }
   };
 

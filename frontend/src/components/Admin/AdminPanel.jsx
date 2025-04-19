@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FaBox, FaPlus, FaUserPlus, FaSignOutAlt } from 'react-icons/fa';
 import { ToastContainer } from 'react-toastify';
+import { Outlet, useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import AllAdminProduct from './AllAdminProduct';
 import CreateNewProducts from './CreateNewProducts';
@@ -8,11 +9,17 @@ import CreateAdmin from './CreateAdmin';
 
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState('products');
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     // Implement logout functionality
     localStorage.removeItem('adminToken');
     window.location.href = '/admin/login';
+  };
+
+  const handleTabClick = (tab) => {
+    setActiveTab(tab);
+    navigate(`/admin/${tab}`);
   };
 
   return (
@@ -34,7 +41,7 @@ const AdminPanel = () => {
           <h1 className="text-2xl font-bold mb-8">Admin Dashboard</h1>
           <nav className="space-y-2">
             <button
-              onClick={() => setActiveTab('products')}
+              onClick={() => handleTabClick('products')}
               className={`w-full flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
                 activeTab === 'products' ? 'bg-blue-600' : 'hover:bg-gray-700'
               }`}
@@ -43,7 +50,7 @@ const AdminPanel = () => {
               <span>All Products</span>
             </button>
             <button
-              onClick={() => setActiveTab('create')}
+              onClick={() => handleTabClick('create')}
               className={`w-full flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
                 activeTab === 'create' ? 'bg-blue-600' : 'hover:bg-gray-700'
               }`}
@@ -52,7 +59,7 @@ const AdminPanel = () => {
               <span>Create Product</span>
             </button>
             <button
-              onClick={() => setActiveTab('admin')}
+              onClick={() => handleTabClick('admin')}
               className={`w-full flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
                 activeTab === 'admin' ? 'bg-blue-600' : 'hover:bg-gray-700'
               }`}
@@ -73,9 +80,7 @@ const AdminPanel = () => {
 
       {/* Main Content */}
       <div className="ml-64 p-8">
-        {activeTab === 'products' && <AllAdminProduct />}
-        {activeTab === 'create' && <CreateNewProducts />}
-        {activeTab === 'admin' && <CreateAdmin />}
+        <Outlet />
       </div>
     </div>
   );
