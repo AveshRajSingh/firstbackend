@@ -20,7 +20,7 @@ const AllAdminProduct = () => {
   const fetchProducts = async (ownerId) => {
     try {
       console.log("owenerId from frontend", ownerId);
-      const response = await axios.get(`http://localhost:3000/api/v1/product/productByOwner/${ownerId}`);
+      const response = await axios.get(`http://localhost:3000/api/v1/products/productByOwner/${ownerId}`);
       console.log("The response is", response.data);
       setProducts(response.data.data);
       setLoading(false);

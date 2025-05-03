@@ -75,7 +75,8 @@ const CreateNewProducts = () => {
                 formDataToSend.append(key, formData[key]);
             });
 
-            const response = await axios.post("/api/products", formDataToSend, {
+            const response = await axios.post("http://localhost:3000/api/v1/products/createProduct", formDataToSend, {
+                withCredentials: true,
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }

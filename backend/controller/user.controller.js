@@ -134,4 +134,19 @@ const changePassword = async (req, res) => {
   res.send(new ApiResponse(200, "Password changed successfully"));
 };
 
-export { registerUser, loginUser, changePassword, getCurrentUser };
+const logoutUser = async (req, res) => {
+  console.log("logout route hit");
+  try {
+    res.clearCookie("token", { sameSite: "none", secure: true });
+    res.clearCookie("refreshToken", { sameSite: "none", secure: true });
+    const user = await User.findById(req.user._id);
+    user.refreshToken = null;
+    await user.save();
+    res.status(200).json(new ApiResponse(200, "Logout successful"));
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(new ApiError(500, "Internal Server Error")); // new ApiError(500, "Internal Server Error");
+  }
+};
+
+export { registerUser, loginUser, changePassword, getCurrentUser,logoutUser };

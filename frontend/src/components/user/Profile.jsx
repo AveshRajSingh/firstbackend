@@ -10,12 +10,49 @@ import {
   FaSignOutAlt,
 } from "react-icons/fa";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
-
+import axios from "axios";
 
 const Profile = () => {
   const { user, setUser } = useContext(UserContext);
   const navigate = useNavigate();
   const location = useLocation();
+  if (
+    user === null ||
+    user === undefined ||
+    user === "" ||
+    Object.keys(user).length === 0
+  ) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+          fontFamily: "sans-serif",
+          color: "#333",
+          flexDirection: "column",
+        }}
+      >
+        <h2 style={{ marginBottom: "0.5rem" }}>🚫 Access Denied</h2>
+        <p style={{ marginBottom: "1rem" }}>Please log in to continue.</p>
+        <button
+          onClick={() => navigate("/login")}
+          style={{
+            padding: "10px 20px",
+            backgroundColor: "#4f46e5",
+            color: "#fff",
+            border: "none",
+            borderRadius: "6px",
+            cursor: "pointer",
+            fontSize: "1rem",
+          }}
+        >
+          Login
+        </button>
+      </div>
+    );
+  }
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -59,7 +96,14 @@ const Profile = () => {
     },
   ];
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    const response = await axios.get(
+      "http://localhost:3000/api/v1/user/logout",
+      {
+        withCredentials: true,
+      }
+    );
+    console.log(response);
     setUser(null);
     navigate("/");
   };

@@ -8,7 +8,9 @@ const Navbar = () => {
   const location = useLocation();
   const { user, setUser } = useContext(UserContext);
 
+ 
   const handleUserClick = () => {
+    
     if (user?.isAdmin) {
       navigate('/admin');
     } else {
@@ -16,10 +18,7 @@ const Navbar = () => {
     }
   };
 
-  const handleLogout = () => {
-    setUser(null);
-    navigate('/');
-  };
+
 
   const handleLogoClick = () => {
     navigate('/products');
@@ -90,13 +89,6 @@ const Navbar = () => {
               }`}
             >
               <User className="h-6 w-6" />
-            </button>
-
-            <button
-              onClick={handleLogout}
-              className="p-2 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors"
-            >
-              <LogOut className="h-6 w-6" />
             </button>
           </div>
         </div>
