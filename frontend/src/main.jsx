@@ -20,11 +20,13 @@ import AllAdminProduct from "./components/Admin/AllAdminProduct.jsx";
 import CreateNewProducts from "./components/Admin/CreateNewProducts.jsx";
 import CreateAdmin from "./components/Admin/CreateAdmin.jsx";
 import Layout from "./components/layout/Layout.jsx";
+import { ProductProvider } from "./context/ProductContext.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>
       <UserProvider>
+        <ProductProvider>
         <Routes>
           <Route element={<Layout />}>
             <Route path="/" element={<App />} />
@@ -46,6 +48,7 @@ createRoot(document.getElementById("root")).render(
             </Route>
           </Route>
         </Routes>
+        </ProductProvider>
       </UserProvider>
     </BrowserRouter>
   </StrictMode>

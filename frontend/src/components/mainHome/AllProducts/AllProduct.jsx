@@ -1,44 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import ProductCard from "../ProductCard.jsx";
-import { ToastContainer, toast } from "react-toastify";
+import { ProductContext } from "../../../context/ProductContext.jsx";
+import { toast } from "react-toastify";
 
 const AllProduct = () => {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  const fetchProducts = async () => {
-    try {
-      const response = await axios.get("http://localhost:3000/api/v1/products/getProducts", {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      if (response.status !== 200) {
-        toast.error("Failed to fetch products");
-        throw new Error("Failed to fetch products");
-      }
-      if (response.data && Array.isArray(response.data.data)) {
-        toast.success("Products fetched successfully");
-        setProducts(response.data.data);
-      } else {
-        throw new Error("Unexpected response format");
-      }
-    } catch (error) {
-      setError(
-        error.response?.data?.message ||
-          error.message ||
-          "Failed to fetch products. Please try again later."
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchProducts();
-  }, []);
+  const { products, loading, error, fetchProducts } =
+    useContext(ProductContext);
 
   if (loading)
     return (
@@ -90,4 +58,3 @@ const AllProduct = () => {
 };
 
 export default AllProduct;
-

@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { FaShoppingCart, FaHeart, FaShoppingBag, FaRegHeart, FaSpinner, FaImage } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import axios from 'axios';
 
 const ProductCard = ({ product }) => {
-  const navigate = useNavigate();
   const [isImageLoading, setIsImageLoading] = useState(true);
   const [isInWishlist, setIsInWishlist] = useState(false);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [imageUrl, setImageUrl] = useState('');
+  const [showQuantitySelector, setShowQuantitySelector] = useState(false);
+  const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
     if (product.imageUrl) {
@@ -21,15 +23,50 @@ const ProductCard = ({ product }) => {
     }
   }, [product.imageUrl]);
 
-  const handleAddToCart = async () => {
+  const handleQuantityChange = (increment) => {
+    setQuantity(prev => {
+      const newQuantity = prev + increment;
+      if (newQuantity < 1 || newQuantity > product.countInStock) {
+        return prev;
+      }
+      return newQuantity;
+    });
+  };
+
+  const addToCart = async() => {
     try {
       setIsAddingToCart(true);
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const response = await axios.post('http://localhost:3000/api/v1/cart/add', {
+        productId: product._id,
+        quantity,
+      }, {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json',
+        },  
+      });
+      console.log("Product added to cart:", response.data);
     } catch (error) {
       console.error('Error adding to cart:', error);
     } finally {
       setIsAddingToCart(false);
     }
+  }
+
+  const handleAddToCart = async () => {
+    // If stock is 1, directly add to cart without showing quantity selector
+    if (product.countInStock <= 1) {
+      addToCart();
+      setShowQuantitySelector(false);
+      return;
+    }
+
+    if (!showQuantitySelector) {
+      setShowQuantitySelector(true);
+      return;
+    }
+     addToCart();
+    setShowQuantitySelector(false);
   };
 
   const handleAddToWishlist = () => {
@@ -49,91 +86,155 @@ const ProductCard = ({ product }) => {
     setIsImageLoading(false);
   };
 
+  // Helper function to validate color
+  const isValidColor = (color) => {
+    return color && (color.match(/^#([A-Fa-f0-9]{3}){1,2}$/) || color.match(/^rgb/));
+  };
+
   return (
-    <div 
-      className="max-w-sm rounded-lg overflow-hidden shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl"
-      style={{ backgroundColor: product.backgroundColor }}
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -5 }}
+      className="rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300"
+      style={{backgroundColor: isValidColor(product.backgroundColor) ? product.backgroundColor : '#fff'}}
     >
-      <div className="relative h-64 group">
+      <div className="relative aspect-[4/3] overflow-hidden">
         {imageUrl && !imageError ? (
           <>
-            <img 
+            <motion.img 
               src={imageUrl} 
               alt={product.name}
-              className={`w-full h-full object-cover transition-opacity duration-300 ${isImageLoading ? 'opacity-0' : 'opacity-100'}`}
+              className="w-full h-full object-cover"
+              initial={{ scale: 1.2, opacity: 0 }}
+              animate={{ scale: 1, opacity: isImageLoading ? 0 : 1 }}
+              transition={{ duration: 0.3 }}
               onLoad={handleImageLoad}
               onError={handleImageError}
               crossOrigin="anonymous"
             />
             {isImageLoading && (
-              <div className="absolute inset-0 flex items-center justify-center bg-gray-200">
-                <FaSpinner className="animate-spin text-gray-500 text-2xl" />
+              <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+                <FaSpinner className="animate-spin text-gray-400 text-3xl" />
               </div>
             )}
           </>
         ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center bg-gray-200">
-            <FaImage className="text-gray-400 text-4xl mb-2" />
-            <span className="text-gray-500 text-sm">No Image Available</span>
+          <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+            <FaImage className="text-gray-400 text-5xl mb-3" />
+            <span className="text-gray-500 text-sm font-medium">No Image Available</span>
           </div>
         )}
-        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300" />
+        
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          onClick={handleAddToWishlist}
+          className="absolute top-4 right-4 p-2 rounded-full bg-white/80 backdrop-blur-sm shadow-lg hover:bg-white transition-colors duration-200"
+        >
+          {isInWishlist ? (
+            <FaHeart className="text-red-500 text-xl" />
+          ) : (
+            <FaRegHeart className="text-gray-600 text-xl" />
+          )}
+        </motion.button>
       </div>
       
-      <div className="px-6 py-4" style={{ color: product.foregroundColor }}>
-        <div className="font-bold text-xl mb-2 truncate">{product.name}</div>
-        <p className="text-gray-700 text-base mb-2 line-clamp-2">
-          {product.description}
-        </p>
-        <div className="flex items-center justify-between mb-4">
-          <span className="text-2xl font-bold">₹{product.price.toLocaleString()}</span>
-          <span className={`text-sm ${product.countInStock > 0 ? 'text-green-600' : 'text-red-600'}`}>
-            {product.countInStock > 0 ? `In Stock: ${product.countInStock}` : 'Out of Stock'}
-          </span>
+      <div className="p-5">
+        <div className="mb-3">
+          <h3 className="font-bold text-xl text-gray-800 mb-1 line-clamp-1">
+            {product.name}
+          </h3>
+          <p className="text-gray-600 text-sm line-clamp-2 h-10">
+            {product.description}
+          </p>
         </div>
         
-        <div className="flex justify-between space-x-2">
-          <button
-            onClick={handleAddToCart}
-            disabled={isAddingToCart || product.countInStock === 0}
-            className={`flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded flex items-center justify-center space-x-2 transition-colors duration-200 ${
-              isAddingToCart || product.countInStock === 0 ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
-          >
-            {isAddingToCart ? (
-              <FaSpinner className="animate-spin" />
-            ) : (
-              <>
-                <FaShoppingCart />
-                <span>Add to Cart</span>
-              </>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-col">
+            <span className="text-2xl font-bold text-gray-900">
+              ₹{product.price.toLocaleString()}
+            </span>
+            <span className={`text-sm ${product.countInStock > 0 ? 'text-green-600' : 'text-red-500'} font-medium`}>
+              {product.countInStock > 0 ? `${product.countInStock} in stock` : 'Out of Stock'}
+            </span>
+          </div>
+          <div className="flex gap-2 items-center relative">
+            {/* Use absolute positioning for quantity selector to prevent layout shift */}
+            {showQuantitySelector && !isAddingToCart && product.countInStock > 1 && (
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.8, x: 0 }}
+                animate={{ opacity: 1, scale: 1, x: 0 }}
+                exit={{ opacity: 0, scale: 0.8, x: 0 }}
+                className="absolute right-full mr-2 bg-white shadow-lg rounded-lg p-1 border border-gray-200"
+              >
+                <div className="flex items-center gap-2">
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => handleQuantityChange(-1)}
+                    className={`w-8 h-8 flex items-center justify-center rounded-md ${
+                      quantity <= 1 ? 'bg-gray-200 text-gray-400' : 'bg-blue-500 text-white hover:bg-blue-600'
+                    } transition-colors duration-200`}
+                    disabled={quantity <= 1}
+                  >
+                    -
+                  </motion.button>
+                  <span className="w-8 text-center font-medium text-gray-700">{quantity}</span>
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => handleQuantityChange(1)}
+                    className={`w-8 h-8 flex items-center justify-center rounded-md ${
+                      quantity >= product.countInStock ? 'bg-gray-200 text-gray-400' : 'bg-blue-500 text-white hover:bg-blue-600'
+                    } transition-colors duration-200`}
+                    disabled={quantity >= product.countInStock}
+                  >
+                    +
+                  </motion.button>
+                </div>
+              </motion.div>
             )}
-          </button>
-          
-          <button
-            onClick={handleAddToWishlist}
-            className={`flex-1 bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded flex items-center justify-center space-x-2 transition-colors duration-200 ${
-              isInWishlist ? 'bg-red-500 hover:bg-red-600' : ''
-            }`}
-          >
-            {isInWishlist ? <FaHeart /> : <FaRegHeart />}
-            <span>{isInWishlist ? 'Added' : 'Wishlist'}</span>
-          </button>
-          
-          <button
-            onClick={handleBuyNow}
-            disabled={product.countInStock === 0}
-            className={`flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded flex items-center justify-center space-x-2 transition-colors duration-200 ${
-              product.countInStock === 0 ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
-          >
-            <FaShoppingBag />
-            <span>Buy Now</span>
-          </button>
+            
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              disabled={isAddingToCart || product.countInStock === 0}
+              onClick={handleAddToCart}
+              className={`p-3 rounded-full ${
+                isAddingToCart || product.countInStock === 0 
+                ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
+                : showQuantitySelector
+                ? 'bg-green-500 text-white hover:bg-green-600'
+                : 'bg-blue-500 text-white hover:bg-blue-600'
+              } transition-colors duration-200`}
+            >
+              {isAddingToCart ? (
+                <FaSpinner className="animate-spin text-xl" />
+              ) : (
+                <FaShoppingCart className="text-xl" />
+              )}
+            </motion.button>
+            
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              disabled={product.countInStock === 0}
+              onClick={handleBuyNow}
+              className={`px-4 py-2 rounded-full ${
+                product.countInStock === 0
+                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                : 'bg-green-500 text-white hover:bg-green-600'
+              } transition-colors duration-200 flex items-center gap-2`}
+            >
+              <FaShoppingBag />
+              <span className="font-medium">Buy Now</span>
+            </motion.button>
+          </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
-export default ProductCard; 
+export default ProductCard;
