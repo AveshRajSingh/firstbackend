@@ -11,11 +11,6 @@ const addToCart = async (req, res) => {
         return res.status(400).json({ message: "Invalid product ID" });
     }
 
-    const qty = parseInt(quantity, 10);
-    if (isNaN(qty) || qty <= 0) {
-        return res.status(400).json({ message: "Quantity must be a positive number" });
-    }
-
     try {
         let cart = await Cart.findOne({ user: userId });
 
@@ -26,13 +21,13 @@ const addToCart = async (req, res) => {
         }
 
         const productIndex = cart.cartItems.findIndex(
-            item => item.product.toString() === productId
+            item => item.product.toString() === productId.toString()
         );
 
         if (productIndex !== -1) {
-            cart.cartItems[productIndex].quantity += qty;
+            cart.cartItems[productIndex].quantity += quantity;
         } else {
-            cart.cartItems.push({ product: productId, quantity: qty });
+            cart.cartItems.push({ product: productId, quantity: quantity });
         }
 
         await cart.save();
@@ -52,8 +47,7 @@ const getCart = async (req, res) => {
     const userId = req.user._id;
     try {
         const cart = await Cart.findOne({ user: userId })
-            .populate("cartItems.product", "name price imageUrl");
-
+            .populate({path: "cartItems.product", model: "Product"});
         if (!cart) {
             return res.status(404).json({ message: "Cart not found" });
         }
@@ -61,7 +55,7 @@ const getCart = async (req, res) => {
         // Remove items with null products (just in case)
         cart.cartItems = cart.cartItems.filter(item => item.product);
 
-        return res.status(200).json({ cart });
+        return res.status(200).json({ cart, message:"cart fetch successful" });
     } catch (error) {
         console.error("Error getting cart:", error);
         return res.status(500).json({
@@ -71,5 +65,39 @@ const getCart = async (req, res) => {
     }
 };
 
+const removeFromCart = async (req, res) => {
+    const { cartId, productId } = req.body;
 
-export { addToCart, getCart };
+    try {
+        const initialCart = await Cart.findById(cartId); // Fixed: use Cart model and await
+
+        if (!initialCart) {
+            return res.status(404).json({ message: "Cart not found" });
+        }
+
+        const productIndex = initialCart.cartItems.findIndex(
+            item => item.product && item.product.toString() === productId.toString()
+          );
+
+        if (productIndex === -1) {
+            return res.status(404).json({ message: "Product not found in cart" });
+        }
+
+        initialCart.cartItems.splice(productIndex, 1);
+       
+        await initialCart.save();
+
+        const cart = await Cart.findById(cartId).populate("cartItems.product")
+
+       return res.status(200).json({ message: "Product removed from cart", cart });
+
+
+    } catch (error) {
+        console.error("Error while deleting from cart:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+
+
+export { addToCart, getCart,removeFromCart };

@@ -1,5 +1,5 @@
 import express from "express";
-import { addToCart, getCart } from "../controller/cart.controller.js";
+import { addToCart, getCart, removeFromCart } from "../controller/cart.controller.js";
 import { verifyUser } from "../middleware/veryfyUser.js";
 
 const router = express.Router();
@@ -9,5 +9,6 @@ router.post("/add", verifyUser, addToCart);
 
 // Get user's cart
 router.get("/", verifyUser, getCart);
+router.post("/remove", verifyUser, removeFromCart);
 
 export default router; 

@@ -8,7 +8,7 @@ const UserProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const fetchUser = async () => {
+const fetchUser = async () => {
     setLoading(true);
     try {
       const response = await axios.get(

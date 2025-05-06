@@ -87,8 +87,6 @@ const getProducts = async (req, res) => {
 
 const getProductByOwner = async (req, res) => {
   const { owner } = req.params;
-  console.log("owner from backend", owner);
-  console.log("route hit getProductByOwner")
   if (!owner) {
     return res.status(400).json(new ApiError(400, "Owner ID is required"));
   }

@@ -1,8 +1,6 @@
-import { useState, useEffect, useContext } from "react";
-import axios from "axios";
+import {  useContext } from "react";
 import ProductCard from "../ProductCard.jsx";
 import { ProductContext } from "../../../context/ProductContext.jsx";
-import { toast } from "react-toastify";
 
 const AllProduct = () => {
   const { products, loading, error, fetchProducts } =
