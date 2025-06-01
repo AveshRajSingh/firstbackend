@@ -134,7 +134,6 @@ const changePassword = async (req, res) => {
 };
 
 const logoutUser = async (req, res) => {
-  console.log("logout route hit");
   try {
     res.clearCookie("token", { sameSite: "none", secure: true });
     res.clearCookie("refreshToken", { sameSite: "none", secure: true });
